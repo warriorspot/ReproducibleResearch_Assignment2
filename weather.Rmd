@@ -4,5 +4,9 @@
 
 # Data Processing 
 
+```{r}
+data <- read.csv("repdata-data-StormData.csv")
+```
+
 # Results
 
