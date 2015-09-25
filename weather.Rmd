@@ -4,9 +4,60 @@
 
 # Data Processing 
 
-```{r}
+```{r, cache=TRUE}
 data <- read.csv("repdata-data-StormData.csv")
 ```
 
 # Results
+
+**Across the United States, which types of events (as indicated in the EVTYPE variable) are most harmful with respect to population health?**
+
+```{r}
+data$HEALTH_EFFECTS <- data$INJURIES + data$FATALITIES
+health <- aggregate(data$HEALTH_EFFECTS, by=list(data$EVTYPE), FUN=sum)
+health <- health[sort.list(health$x, decreasing=TRUE),]
+names(health) <- c("event", "count")
+```
+Top ten most harmful weather event types
+
+```{r}
+p <- head(health, n=5)
+barplot(p$count, names.arg=p$event)
+```
+
+**Across the United States, which types of events have the greatest economic consequences?**
+
+```{r}
+get_cost <- function(cost, modifier) {
+    mult <- 0
+
+    if(modifier == "K") {
+        mult <- 1000
+    }
+
+    if(modifier == "M") {
+        mult <- 1000000
+    }
+
+    if(modifier == "B") {
+        mult <- 1000000000 
+    }
+
+    cost * mult
+}
+
+cost <- data.frame(EVTYPE=data$EVTYPE, PROPDMG=data$PROPDMG, PROPDMGEXP=data$PROPDMGEXP, CROPDMG=data$CROPDMG, CROPDMGEXP=data$CROPDMGEXP)
+x <- mapply(get_cost, cost$PROPDMG, cost$PROPDMGEXP) 
+y <- mapply(get_cost, cost$CROPDMG, cost$CROPDMGEXP) 
+cost$total_cost <- x + y
+z <- aggregate(cost$total_cost, by=list(cost$EVTYPE), FUN=sum)
+z <- z[sort.list(z$x, decreasing=TRUE),]
+```
+
+Most costly weather events:
+
+```{r}
+head(z, n=10)
+```
+
 
