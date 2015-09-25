@@ -1,4 +1,4 @@
-#data <- read.csv("repdata-data-StormData.csv")
+data <- read.csv("repdata-data-StormData.csv")
 data$HEALTH_EFFECTS <- data$INJURIES + data$FATALITIES
 
 health <- aggregate(data$HEALTH_EFFECTS, by=list(data$EVTYPE), FUN=sum)
