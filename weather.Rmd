@@ -18,11 +18,18 @@ health <- aggregate(data$HEALTH_EFFECTS, by=list(data$EVTYPE), FUN=sum)
 health <- health[sort.list(health$x, decreasing=TRUE),]
 names(health) <- c("event", "count")
 ```
-Top ten most harmful weather event types
+```{r echo=FALSE}
+n <- 5
+```
+Top `r n` most harmful weather event types:
 
-```{r}
-p <- head(health, n=5)
-barplot(p$count, names.arg=p$event)
+```{r echo=FALSE}
+colors <- c("blue", "green", "red", "orange", "violet")
+
+p <- head(health, n=n)
+barplot(p$count, col=colors, xlab="Event Type", ylab="Injuries + Deaths", main="Most Harmful Weather Events")
+legend("topright", legend=p$event, fill=colors)
+
 ```
 
 **Across the United States, which types of events have the greatest economic consequences?**
@@ -49,15 +56,18 @@ get_cost <- function(cost, modifier) {
 cost <- data.frame(EVTYPE=data$EVTYPE, PROPDMG=data$PROPDMG, PROPDMGEXP=data$PROPDMGEXP, CROPDMG=data$CROPDMG, CROPDMGEXP=data$CROPDMGEXP)
 x <- mapply(get_cost, cost$PROPDMG, cost$PROPDMGEXP) 
 y <- mapply(get_cost, cost$CROPDMG, cost$CROPDMGEXP) 
-cost$total_cost <- x + y
+cost$total_cost <- (x + y) / 1000
 z <- aggregate(cost$total_cost, by=list(cost$EVTYPE), FUN=sum)
 z <- z[sort.list(z$x, decreasing=TRUE),]
+names(z) <- c("event", "count") 
 ```
 
 Most costly weather events:
 
 ```{r}
-head(z, n=10)
+p <- head(z, n=n)
+barplot(p$count, col=colors, xlab="Event Type", ylab="Cost (K Dollars)", main="Most Expensive Weather Events")
+legend("topright", legend=p$event, fill=colors)
 ```
 
 
